@@ -1,297 +1,349 @@
-let sectionCartItems = document.getElementById("cart__items")
-let spanQuantity = document.getElementById("totalQuantity")
-let spanTotalPrice = document.getElementById("totalPrice")
+async function  init(){
 
-let totalQt = 0
-let prixtotal = 0
+    let arrayStorage = localStorage.getItem("ArrayStorage");
+    arrayStorage = JSON.parse(arrayStorage);
 
-for( let i = 0; i < localStorage.length; i++){
- 
-    let stokey = localStorage.key(i);
-    let stoget = localStorage.getItem(stokey);
-    let stockageObject = JSON.parse(stoget);
+    console.log(JSON.stringify(arrayStorage))
 
-    console.log(stockageObject)
+    if(localStorage.length == 0 || JSON.stringify(arrayStorage) == "[]"){
 
-    let idStockage = stockageObject.id
-    let colorStockage = stockageObject.couleur
-    let quantiteStockage = stockageObject.quantite
+    alert("Votre panier est vide");
+    location.replace("./index.html");
 
-    let promise = fetch("http://localhost:3000/api/products/"+ idStockage)
+    } else {
 
-    promise
-        .then((response) => {
-        
-        const productData = response.json();
-
-        productData.then((infos) => {
-
-            let article = document.createElement("article")
-            let classCartItem = document.createAttribute("class")
-                classCartItem.value = "cart__item"
-
-            let dataId = document.createAttribute("data-id")
-                dataId.value = idStockage
-
-            let dataColor = document.createAttribute("data-color")
-                dataColor.value = colorStockage
-
-            article.setAttributeNode(classCartItem)
-            article.setAttributeNode(dataId)
-            article.setAttributeNode(dataColor)
+        for (object in arrayStorage){
 
 
-            let divItemImg = document.createElement("div")
-            let classItemImg = document.createAttribute("class")
-                classItemImg.value = "cart__item__img"
+            let id = arrayStorage[object].id;
 
-            divItemImg.setAttributeNode(classItemImg)
 
-            let img = document.createElement("img")
-            let imgSrc = document.createAttribute("src")
-                imgSrc.value = infos.imageUrl;
 
-            let imgAlt = document.createAttribute("alt")
-                imgAlt.value = infos.altTxt;
+
+            let promise = fetch("http://localhost:3000/api/products/"+ id);
+
+  
 
             
-            img.setAttributeNode(imgSrc)
-            img.setAttributeNode(imgAlt)
+            await promise.then(async (response) => {
 
-            let divItemContent = document.createElement("div")
 
-            let classItemContent = document.createAttribute("class")
-            classItemContent.value = "cart__item__content"
 
-            divItemContent.setAttributeNode(classItemContent)
-
-            let divItemContentDescription = document.createElement("div")
-
-            let classItemContentDescription = document.createAttribute("class")
-                classItemContentDescription.value = "cart__item__content__description"
-
-                divItemContentDescription.setAttributeNode(classItemContentDescription)
-
-                let h2 = document.createElement("h2")
-                    h2.textContent = infos.name;
-
-                let paraColor = document.createElement("p")
-                    paraColor.textContent = colorStockage
-
-                let paraPrice = document.createElement("p")
-                    paraPrice.textContent = infos.price + "€"
-
-                let divItemContentSetting = document.createElement("div")
                 
-                let classItemContentSetting = document.createAttribute("class")
-                    classItemContentSetting.value = "cart__item__content__settings"
+                let productData = response.json();
 
-                divItemContentSetting.setAttributeNode(classItemContentSetting)
-
-                    let divItemContentSettingQt = document.createElement("div")
                 
-                    let classItemContentSettingQt = document.createAttribute("class")
-                        classItemContentSettingQt.value = "cart__item__content__settings_quantity"
 
-                        divItemContentSettingQt.setAttributeNode(classItemContentSettingQt)
+                await productData.then(async (infos) => {
 
-                            let paraQt = document.createElement("p")
-                                paraQt.textContent = "Qté : " + quantiteStockage
+                console.log(infos, arrayStorage)
 
-                            let inputQt = document.createElement("input")
-
-                                let typeInput = document.createAttribute("type")
-                                typeInput.value = "number"
-
-                                let classInput = document.createAttribute("class")
-                                    classInput.value = "itemQuantity"
-
-                                let nameInput = document.createAttribute("name")
-                                    nameInput.value = "itemQuantity"
-
-                                let minInput = document.createAttribute("min")
-                                    minInput.value = 1
-
-                                let maxInput = document.createAttribute("max")
-                                    maxInput.value = 100
-
-                                let valueInput = document.createAttribute("value")
-                                    valueInput.value = quantiteStockage
-                                
-
-                                    inputQt.setAttributeNode(typeInput)
-                                    inputQt.setAttributeNode(classInput)
-                                    inputQt.setAttributeNode(nameInput)
-                                    inputQt.setAttributeNode(minInput)
-                                    inputQt.setAttributeNode(maxInput)
-                                    inputQt.setAttributeNode(valueInput)
+                let objCreateItems = createItems(infos, object,arrayStorage);
 
 
-                    let divItemContentSettingDel = document.createElement("div")
-
-                    let classItemContentSettingDel = document.createAttribute("class")
-                        classItemContentSettingDel.value = "cart__item__content__settings_delete"
-
-                    divItemContentSettingDel.setAttributeNode(classItemContentSettingDel)
-
-                                let paraDel = document.createElement("p")
-                                let classParaDel = document.createAttribute("class")
-                                    classParaDel.value = "deleteItem"
-
-                                paraDel.setAttributeNode(classParaDel)
-
-                                paraDel.textContent = "Supprimer"
-
-                                sectionCartItems.append(article)
-                                    article.append(divItemImg)
-                                        divItemImg.append(img)
-                                    article.append(divItemContent)
-                                        divItemContent.append(divItemContentDescription)
-                                            divItemContentDescription.append(h2)
-                                            divItemContentDescription.append(paraColor)
-                                            divItemContentDescription.append(paraPrice)
-                                        divItemContent.append(divItemContentSetting)
-                                            divItemContentSetting.append(divItemContentSettingQt)
-                                                divItemContentSettingQt.append(paraQt)
-                                                divItemContentSettingQt.append(inputQt)
-                                            divItemContentSetting.append(divItemContentSettingDel)
-                                                divItemContentSettingDel.append(paraDel)
-
-                                                paraDel.addEventListener("click", function delCommand() 
-                                                {
-                        
-                                                let idDel = article.dataset.id
-                                                let colorDel = article.dataset.color
-                        
-                                                console.log(idDel, colorDel)
-                        
-                                                for( let i = 0; i < localStorage.length; i++){
-                        
-                                                let stokey = localStorage.key(i);
-                                                let stoget = localStorage.getItem(stokey);
-                                                let stockageObject = JSON.parse(stoget);
-                        
-                                                let idstorage = stockageObject.id;
-                                                let colorstorage = stockageObject.couleur;
-                        
-                                                if ( idDel == idstorage && colorDel == colorstorage){
-                        
-                                                localStorage.removeItem(stokey);
-                        
-                        
-                                                
-                                                article.remove()
-                                                divItemImg.remove()
-                                                divItemContent.remove()
-                                                img.remove()
-                                                h2.remove()
-                                                paraColor.remove()
-                                                paraPrice.remove()
-                                                divItemContentSetting.remove()
-                                                divItemContentSettingDel.remove()
-                                                divItemContentSettingQt.remove()
-                                                paraQt.remove()
-                                                inputQt.remove()
-                                                paraDel.remove()
-                                                    
-                        
-                                                }
-                        
-                                                }
-                        
-                                
-                                
-                        
-                        
-                                        
-                        
-                        
-                        
-                                })
-
-                                totalQt = Number(totalQt)
-                                quantiteStockage = Number(quantiteStockage)
+                let objCalculQt = calculQt(infos, arrayStorage, object);
 
 
-                                totalQt = quantiteStockage + totalQt
+            
+                objCalculQt.spanTotalPrice.textContent =+ objCalculQt.prixtotal;
 
-                                let prixtotalproduit = quantiteStockage * infos.price
-                                prixtotal = prixtotal + prixtotalproduit
-                                spanTotalPrice.textContent = prixtotal
+                objCalculQt.spanQuantity.textContent =+ objCalculQt.totalQt;
 
-                                    
 
-                               
+                objCreateItems.paraDel.addEventListener("click", (event) => {
+                    delCommand(object, arrayStorage,objCreateItems, objCalculQt, infos);
+                });
 
-                                spanQuantity.textContent = totalQt
+                objCreateItems.inputQt.addEventListener("change", (event) => {
+                    qtChange(object, objCreateItems, infos, arrayStorage, objCalculQt);
+                });
 
-                                inputQt.addEventListener("change", function qtChange () {
-        
-                                    console.log(totalQt)
-                            
-                                let newQT = inputQt.value
-                            
 
-                                prixtotal = prixtotal - prixtotalproduit
+                });
 
-                                
-                                totalQt = Number(totalQt)
-                                quantiteStockage = Number(quantiteStockage)
-
-                                totalQt = totalQt - quantiteStockage
-                             
-                                quantiteStockage = newQT
-
-                                prixtotalproduit = quantiteStockage * infos.price
-                                prixtotal = prixtotal + prixtotalproduit
-                                spanTotalPrice.textContent = prixtotal
+            });
 
 
 
-                                totalQt = Number(totalQt)
-                                quantiteStockage = Number(quantiteStockage)
-
-                                totalQt = totalQt + quantiteStockage
-
-                            
-                                spanQuantity.textContent = totalQt
-
-
-        
-                                
-                                paraQt.textContent = "Qté : " + quantiteStockage
-
-                                quantiteStockage = quantiteStockage.toString();
-                                stockageObject.quantite = quantiteStockage
-
-                                localStorage.setItem(stokey, JSON.stringify(stockageObject))
-
-                            
+        };
+    };
 
 
 
-                                return quantiteStockage
-        
-        
-                                })
+
+};
+
+
+function createItems(infos, object, arrayStorage){
+
+    console.log(object)
+
+    let article = document.createElement("article")
+    article.setAttribute('class',"cart__item")
+    article.setAttribute('date-id',infos.id)
+    article.setAttribute('data-color',arrayStorage[object].couleur)
+
+
+    let divItemImg = document.createElement("div")
+    divItemImg.setAttribute('class',"cart__item__img")
+
+
+    let img = document.createElement("img")
+    img.setAttribute('src', infos.imageUrl)
+    img.setAttribute('alt', infos.altTxt)
+
+
+    let divItemContent = document.createElement("div")
+    divItemContent.setAttribute('class',"cart__item__content")
+
+
+    let divItemContentDescription = document.createElement("div")
+    divItemContentDescription.setAttribute('class',"cart__item__content__description")
+
+
+        let h2 = document.createElement("h2")
+        h2.textContent = infos.name;
+
+        let paraColor = document.createElement("p")
+        paraColor.textContent = arrayStorage[object].couleur
+
+        let paraPrice = document.createElement("p")
+        paraPrice.textContent = infos.price + "€"
+
+        let divItemContentSetting = document.createElement("div")
+        divItemContentSetting.setAttribute('class', "cart__item__content__settings")
+
+
+            let divItemContentSettingQt = document.createElement("div")
+
+                divItemContentSettingQt.setAttribute('class',"cart__item__content__settings_quantity")
+
+                    let paraQt = document.createElement("p")
+                        paraQt.textContent = "Qté : " + arrayStorage[object].quantite
+
+                    let inputQt = document.createElement("input")
+                    inputQt.setAttribute('type',"number")
+                    inputQt.setAttribute('class',"itemQuantity")
+                    inputQt.setAttribute('name',"itemQuantity")
+                    inputQt.setAttribute('min', 1)
+                    inputQt.setAttribute('max',100)
+                    inputQt.setAttribute('value', arrayStorage[object].quantite)
+
+            let divItemContentSettingDel = document.createElement("div")
+            divItemContentSettingDel.setAttribute('class',"cart__item__content__settings_delete")
+
+                        let paraDel = document.createElement("p")
+                        paraDel.setAttribute('class',"deleteItem")
+                        paraDel.textContent = "Supprimer"
+
+                    let objtCreateItems = {
+
+                        article : article,
+                        divItemImg : divItemImg,
+                        divItemContent : divItemContent,
+                        divItemContentSetting: divItemContentSetting,
+                        img: img,
+                        divItemContentDescription: divItemContentDescription,
+                        h2 : h2,
+                        paraColor : paraColor,
+                        paraPrice : paraPrice,
+                        paraQt : paraQt,
+                        inputQt : inputQt,
+                        paraDel : paraDel,
+                        divItemContentSettingDel: divItemContentSettingDel,
+                        divItemContentSettingQt : divItemContentSettingQt
+
+
+                    }
 
 
 
-                                
 
 
-                        })
+                        ajoutItems(objtCreateItems)
 
-          
+                        return objtCreateItems;
+
+}
+
+
+
+function ajoutItems(objtCreateItems){
 
     
-    
+    let sectionCartItems = document.getElementById("cart__items")
 
-    })
-    
+
+    sectionCartItems.append(objtCreateItems.article)
+        objtCreateItems.article.append(objtCreateItems.divItemImg, objtCreateItems.divItemContent, objtCreateItems.divItemContentSetting)
+        objtCreateItems.divItemImg.append(objtCreateItems.img)
+        objtCreateItems.divItemContent.append(objtCreateItems.divItemContentDescription)
+        objtCreateItems.divItemContentDescription.append(objtCreateItems.h2, objtCreateItems.paraColor, objtCreateItems.paraPrice)
+        objtCreateItems.divItemContentSetting.append(objtCreateItems.divItemContentSettingQt, objtCreateItems.divItemContentSettingDel)
+        objtCreateItems.divItemContentSettingQt.append(objtCreateItems.paraQt, objtCreateItems.inputQt)
+        objtCreateItems.divItemContentSettingDel.append(objtCreateItems.paraDel)
 
 
 
 
 }
 
+
+function delCommand(object, arrayStorage, objCreateItems, objCalculQt, infos) {
+                        
+            console.log(arrayStorage)                             
+
+            let arrayStorageQt = arrayStorage[object].quantite
+                
+            arrayStorage.splice(object,1)
+
+            console.log(object)
+
+            localStorage.ArrayStorage = JSON.stringify(arrayStorage);
+                                   
+
+
+            location.reload();
+
+            
+
+            if(JSON.stringify(arrayStorage) == "[]"){
+
+
+            alert("Votre panier est vide");
+            location.replace("./index.html");
+
+
+            } else {
+
+                let prixtotal = objCalculQt.prixtotal;
+                let totalQt = objCalculQt.totalQt;
+
+                console.log(prixtotal, totalQt)
+
+                let prixObjet = infos.price * arrayStorageQt
+
+                prixtotal = Number(prixtotal) - Number(prixObjet)
+
+                console.log(prixtotal, prixObjet, infos.price, arrayStorageQt)
+
+                objCalculQt.spanTotalPrice.textContent = prixtotal;
+
+                objCalculQt.spanQuantity.textContent = totalQt - arrayStorageQt;
+            
+            }
+
+                                            
+}
+
+function calculQt(infos, arrayStorage, object){
+
+
+    let spanQuantity = document.getElementById("totalQuantity");
+    let spanTotalPrice = document.getElementById("totalPrice");
+
+    let totalQt = Number(spanQuantity.textContent);
+    let prixtotal = Number(spanTotalPrice.textContent);
+
+    quantiteStockage = Number(arrayStorage[object].quantite);
+
+    totalQt = quantiteStockage + totalQt;
+
+    let prixtotalproduit = quantiteStockage * infos.price;
+    prixtotal = prixtotal + prixtotalproduit;
+    
+
+
+    let objCalculQt = {
+        prixtotal : prixtotal ,
+        totalQt : totalQt,
+        spanQuantity : spanQuantity,
+        spanTotalPrice : spanTotalPrice,
+        prixtotalproduit: prixtotalproduit
+
+    }
+
+    return objCalculQt
+    
+
+}
+
+
+function qtChange (object, objCreateItems, infos, arrayStorage, objCalculQt) {
+
+    
+    
+    console.log(arrayStorage);
+    
+
+    let prixtotalproduit = Number(objCalculQt.totalQt) * infos.price;
+
+    console.log(prixtotalproduit, arrayStorage, object);
+
+    prixtotal = Number(objCalculQt.spanTotalPrice.textContent) - prixtotalproduit;
+
+       
+    let newQT = objCreateItems.inputQt.value;
+
+    if (newQT <= 0){
+
+    alert("La valeur doit être au dessus de 0 ou être supprimer via le bouton supprimer")
+    
+
+    } else {
+
+    
+
+    console.log(prixtotal);
+
+    let totalQt = Number(objCalculQt.spanQuantity.textContent);
+    
+    let quantiteStockage = Number(arrayStorage[object].quantite);
+
+
+    totalQt = totalQt - quantiteStockage;
+
+
+    quantiteStockage = newQT;
+
+
+    prixtotalproduit = quantiteStockage * infos.price;
+    prixtotal = prixtotal + prixtotalproduit;
+    objCalculQt.spanTotalPrice.textContent = prixtotal;
+
+
+
+    totalQt = Number(totalQt) + Number(quantiteStockage);
+    
+    
+    objCalculQt.spanQuantity.textContent = totalQt;
+    
+    
+    objCreateItems.paraQt.textContent = "Qté : " + quantiteStockage;
+
+    arrayStorage[object].quantite = quantiteStockage;
+
+    console.log(arrayStorage[object].quantite, totalQt);
+
+    localStorage.ArrayStorage = JSON.stringify(arrayStorage);
+
+    objCalculQt.totalQt = totalQt
+
+
+    }
+
+}
+
+
+
+
+    
+    
+
+
+
+
+
+window.addEventListener("DOMContentLoaded", (event) => {
+    init();
+  });
