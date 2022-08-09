@@ -7,7 +7,6 @@ function init(){
 
     id = recupId();
 
-
     let promise01 = fetch("http://localhost:3000/api/products/"+ id);
 
     promise01
@@ -17,16 +16,13 @@ function init(){
 
         productData.then((infos) => { 
 
+            createItems(infos);
 
-        createItems(infos);
+            let addToCart = document.getElementById("addToCart");
 
-        let addToCart = document.getElementById("addToCart");
-
-        addToCart.addEventListener("click", (event) => {
-        createcommand();
-        });
-
-
+            addToCart.addEventListener("click", (event) => {
+                createcommand();
+            });
 
         })
 
@@ -36,7 +32,7 @@ function init(){
 
 
 /** 
- * 
+ * argument: infos
  * 
  * cette fonction créé les items suite a la recuperation des donnés effectuer en amont et declenche la fonction addColor
 */
@@ -48,22 +44,14 @@ function createItems(infos){
 
     img.setAttribute('alt', infos.altTxt);
 
-
     let imgcontainer = document.getElementsByClassName("item__img") ;
     imgcontainer[0].append(img);
-
-
 
     let title = document.getElementById("title");
     title.textContent = infos.name;
 
-
-
     let pricehtml = document.getElementById("price");
     pricehtml.textContent = infos.price;
-
-
-
 
     let descriptionhtml = document.getElementById("description");
     descriptionhtml.textContent = infos.description;
@@ -71,16 +59,15 @@ function createItems(infos){
     console.log(infos);
     let colors = infos.colors;
 
+    for (color in colors){ 
 
-        for (color in colors){ 
+        addColor(colors);
 
-            addColor(colors);
-
-        }
+    }
 }
 
 /** 
- * arguement colors
+ * argument colors
  * 
  * créer les valeurs option et valeur et les ajjoutes au selecteur
 */
@@ -95,12 +82,8 @@ let text = colors[color];
 option.setAttributeNode(valeur);
 option.textContent = text;
 
-
 let selector = document.getElementById("colors");
 selector.append(option);
-
-
-
 
 }
 
@@ -113,7 +96,7 @@ selector.append(option);
 /** 
  * 
  * 
- *  valeur qui initie la création de la command
+ *  valeur qui initie la création de la commande
 */
 function createcommand () {
 
@@ -121,19 +104,17 @@ function createcommand () {
 
     console.log(recupValeur);
 
-
     if (colorcommand == "" ){
 
         alert("Veuillez choisir une couleur");
 
-
     }
-   
+
     else {
 
         if (numbercommand < 1){
 
-        alert("Veuillez choisir une quantité au-dessus de 0");
+            alert("Veuillez choisir une quantité au-dessus de 0");
 
         }
 
@@ -145,113 +126,83 @@ function createcommand () {
 
             if (localStorage.length != 0 && ArrayStorage != "[]" ){
 
-              
-              ArrayStorage = JSON.parse(ArrayStorage);
+                ArrayStorage = JSON.parse(ArrayStorage);
 
                 for( object in ArrayStorage ){
 
                     console.log(object)
-  
+
                     let objectSto = ArrayStorage[object]
-                    
+
                     let recupValueCommand = recupValue();
 
                     console.log(objectSto.id,recupValueCommand.idcommand, objectSto.couleur,recupValueCommand.colorcommand)
 
-                        if( objectSto.id === recupValueCommand.idcommand && objectSto.couleur === recupValueCommand.colorcommand){
+                    if( objectSto.id === recupValueCommand.idcommand && objectSto.couleur === recupValueCommand.colorcommand){
 
                         changementquantite(objectSto, object);
 
                         break;
 
-                        }
-
-                        else if( object == (Number(ArrayStorage.length)-1)) {
+                    } else if( object == (Number(ArrayStorage.length)-1)) {
 
                         addItem(object)
 
-
-                        }
                     }
-                
-            }
-
-
+                }
+            } 
             else { 
 
-            
-
-            addFirstItem();
+                addFirstItem();
 
             }
-
         }
     }
-
-
-
-
 }
+
 
 /** 
  * 
- * un id : String
+ * Renvoie un id : String
  * fonction qui sert à aller chercher l'id grace à l'URL
 */
 function recupId(){
 
-let href = window.location.href;
+    let href = window.location.href;
     let  url = new URL(href);
     let id = url.searchParams.get("id");
 
     return id
 }
 
+
 /** 
- * l'argument i
- * un objet contenant la valeur stokey et stockageObject
- * 
+ * l'argument object
+ * Renvoie l'object objRecupSto
+ * Recupere les infos du arrayStorage est les place dans un object objRecupSto
 */
 function recupSto(object){
-
-    //let stokey = localStorage.key(i);
-    //let stoget = localStorage.getItem(stokey);
-    //let stockageObject = JSON.parse(stoget);
-
-    console.log(object)
 
     ArrayStorage = localStorage.getItem("ArrayStorage");
 
     ArrayStorage = JSON.parse(ArrayStorage);
-    
+
     let elementArray = ArrayStorage[object];
 
+    let objRecupSto = {
 
+        ArrayStorage : ArrayStorage,
+        elementArray : elementArray
 
-
-   
-
-    
-
-
-let objRecupSto = {
-
-ArrayStorage : ArrayStorage,
-elementArray : elementArray
-
-
-}
-
-
-
-
+    }
 
     return objRecupSto;
 }
 
+
 /** 
- * l'argument i
- * 
+ * l'argument object
+ * renvoie ObjStockage
  * à l'aide de la fonction recupSto, on recupere les valeurs stockage objet et on initialise un nouvelle objet qu'on utilisera plu tard
 */
 function initSto(object){
@@ -259,20 +210,15 @@ function initSto(object){
     let ArrayStorage = recupSto(object).ArrayStorage;
     let elementArray = recupSto(object).elementArray;
 
-    console.log(elementArray)
-
     let ObjStockage = {
 
-    idstorage : elementArray.id,
-    colorstorage : elementArray.couleur,
-    numberstorage : elementArray.quantite,
-    elementArray: elementArray,
-    ArrayStorage : ArrayStorage
-
+        idstorage : elementArray.id,
+        colorstorage : elementArray.couleur,
+        numberstorage : elementArray.quantite,
+        elementArray: elementArray,
+        ArrayStorage : ArrayStorage
 
     }
-
-    console.log(ObjStockage);
 
     return ObjStockage;
 
@@ -291,34 +237,27 @@ function recupValue(){
     colorcommand = selector.value;
     numbercommand = inputquantity.value;
 
+    let objValue = {
 
+        idcommand : id ,
+        colorcommand : colorcommand,
+        numbercommand : numbercommand,
 
-let objValue = {
-
-    idcommand : id ,
-    colorcommand : colorcommand,
-
-    numbercommand : numbercommand,
-
-
-}
+    }
 
     return objValue;
+
 }
 
 /** 
- * 
+ * Argument: objectSto, object
  * 
  * Recupere les valeurs recupValeur et valeurSto et remplace les quantités
 */
 function changementquantite(objectSto, object){
 
     let arrayStorage = localStorage.getItem("ArrayStorage");
-    arrayStorage = JSON.parse(arrayStorage)
-
-
-
-
+    arrayStorage = JSON.parse(arrayStorage);
 
     let recupValeur = recupValue();
 
@@ -328,35 +267,25 @@ function changementquantite(objectSto, object){
 
     console.log(objectSto,objectSto.quantite , object)
 
-    arrayStorage[object] = objectSto
-
-    console.log(arrayStorage)
+    arrayStorage[object] = objectSto;
 
     localStorage.ArrayStorage = JSON.stringify(arrayStorage);
-    
-    
-    alert("Votre commande a été ajouter")
 
-
-
-
-
+    alert("Votre commande a été ajouter");
 
 }
+
 
 /** 
  * 
  * renvoie une alert 
- * ajjoute l'objet commandesto au local storage
+ * ajjoute push un objet a l'arrayStorage recuperer et remplace le ArrayStorage du localStorage par l'arrayStorage modifier
 */
 function addItem() {
 
 let objInitSto = initSto(object);
 
 arrayStorage = objInitSto.ArrayStorage;
-
-
-console.log(ArrayStorage)
 
 let recupValeur = recupValue();
 
@@ -366,28 +295,28 @@ arrayStorage.push({id: recupValeur.idcommand, couleur: recupValeur.colorcommand,
 
 localStorage.setItem('ArrayStorage', JSON.stringify(arrayStorage));
 
-alert("Votre commande a été ajjouter au panier");
-
+alert("Votre commande a été ajouter au panier");
 
 }
 
-
+/**
+ * 
+ * Renvoie une alert
+ * ajoute le premier Item si jamais le localStorage est vide
+ */
 function addFirstItem() {
 
     let ArrayStorage = [];
 
     let recupValeur = recupValue();
-    
-    console.log(recupValeur);
-    
+
     ArrayStorage.push({id: recupValeur.idcommand, couleur: recupValeur.colorcommand, quantite: recupValeur.numbercommand});
-    
+
     localStorage.setItem('ArrayStorage', JSON.stringify(ArrayStorage));
-    
+
     alert("Votre commande a été ajouter au panier");
-    
-    
-    }
+
+}
 
 
 window.addEventListener("DOMContentLoaded", (event) => {
