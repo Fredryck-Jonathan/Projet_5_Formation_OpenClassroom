@@ -1,14 +1,22 @@
 function init() {
 
-        fetch("http://localhost:3000/api/products")
-        
+    let promise = fetch("http://localhost:3000/api/products")
+
+
         .then((response) => response.json())
         .then((products) => {
             turnOnProducts(products);
+    
             
         
         });
-        
+        promise.catch((err) =>{
+
+            alert("Nous avons une erreur du type "+ err +" merci de contacter le service client")
+
+        }
+        )
+
 
  
 }
