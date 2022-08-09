@@ -65,51 +65,51 @@ function createItems(infos,  product){
     divItemContentDescription.setAttribute('class',"cart__item__content__description");
 
 
-        let h2 = document.createElement("h2");
-        h2.textContent = infos.name;
+    let h2 = document.createElement("h2");
+    h2.textContent = infos.name;
 
-        let paraColor = document.createElement("p");
-        paraColor.textContent = product.couleur;
+    let paraColor = document.createElement("p");
+    paraColor.textContent = product.couleur;
 
-        let paraPrice = document.createElement("p");
-        paraPrice.textContent = infos.price + "€";
+    let paraPrice = document.createElement("p");
+    paraPrice.textContent = infos.price + "€";
 
-        let divItemContentSetting = document.createElement("div");
-        divItemContentSetting.setAttribute('class', "cart__item__content__settings");
+    let divItemContentSetting = document.createElement("div");
+    divItemContentSetting.setAttribute('class', "cart__item__content__settings");
 
 
-            let divItemContentSettingQt = document.createElement("div");
+    let divItemContentSettingQt = document.createElement("div");
 
-                divItemContentSettingQt.setAttribute('class',"cart__item__content__settings_quantity");
+    divItemContentSettingQt.setAttribute('class',"cart__item__content__settings_quantity");
 
-                    let paraQt = document.createElement("p");
-                        paraQt.textContent = "Qté : " + product.quantite;
+    let paraQt = document.createElement("p");
+    paraQt.textContent = "Qté : " + product.quantite;
 
-                    let inputQt = document.createElement("input");
-                    inputQt.setAttribute('type',"number");
-                    inputQt.setAttribute('class',"itemQuantity");
-                    inputQt.setAttribute('name',"itemQuantity");
-                    inputQt.setAttribute('min', 1);
-                    inputQt.setAttribute('max',100);
-                    inputQt.setAttribute('value', product.quantite);
-                    inputQt.priceProd = infos.price;
-                    inputQt.idProd = product.id;
-                    inputQt.colorProd = product.couleur;
-                    inputQt.addEventListener("change", (event) => {
-                        qtChange(event);
-                    });
+    let inputQt = document.createElement("input");
+    inputQt.setAttribute('type',"number");
+    inputQt.setAttribute('class',"itemQuantity");
+    inputQt.setAttribute('name',"itemQuantity");
+    inputQt.setAttribute('min', 1);
+    inputQt.setAttribute('max',100);
+    inputQt.setAttribute('value', product.quantite);
+    inputQt.priceProd = infos.price;
+    inputQt.idProd = product.id;
+    inputQt.colorProd = product.couleur;
+    inputQt.addEventListener("change", (event) => {
+        qtChange(event);
+    });
 
-            let divItemContentSettingDel = document.createElement("div");
-            divItemContentSettingDel.setAttribute('class',"cart__item__content__settings_delete");
+    let divItemContentSettingDel = document.createElement("div");
+    divItemContentSettingDel.setAttribute('class',"cart__item__content__settings_delete");
 
-                        let paraDel = document.createElement("p");
-                        paraDel.setAttribute('class',"deleteItem");
-                        paraDel.textContent = "Supprimer";
-                        paraDel.idProd = product.id;
-                        paraDel.colorProd = product.couleur;
-                        paraDel.addEventListener("click", (event) => {
-                            delCommand(event);
-                        });
+    let paraDel = document.createElement("p");
+    paraDel.setAttribute('class',"deleteItem");
+    paraDel.textContent = "Supprimer";
+    paraDel.idProd = product.id;
+    paraDel.colorProd = product.couleur;
+    paraDel.addEventListener("click", (event) => {
+        delCommand(event);
+    });
 
     let objtCreateItems = {
 
