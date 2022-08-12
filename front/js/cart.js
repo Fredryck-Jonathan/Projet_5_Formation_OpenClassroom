@@ -29,6 +29,12 @@ async function  init(){
 
             calculQt();
 
+            let submit =  document.getElementById('order')
+ 
+            submit.addEventListener("click", (event) => {
+                submitOrder(event);
+            });
+
         };
 
     };
@@ -47,19 +53,15 @@ function createItems(infos,  product){
     article.setAttribute('date-id', product.id);
     article.setAttribute('data-color', product.couleur);
 
-
     let divItemImg = document.createElement("div");
     divItemImg.setAttribute('class',"cart__item__img");
-
 
     let img = document.createElement("img");
     img.setAttribute('src', infos.imageUrl);
     img.setAttribute('alt', infos.altTxt);
 
-
     let divItemContent = document.createElement("div");
     divItemContent.setAttribute('class',"cart__item__content");
-
 
     let divItemContentDescription = document.createElement("div");
     divItemContentDescription.setAttribute('class',"cart__item__content__description");
@@ -76,7 +78,6 @@ function createItems(infos,  product){
 
     let divItemContentSetting = document.createElement("div");
     divItemContentSetting.setAttribute('class', "cart__item__content__settings");
-
 
     let divItemContentSettingQt = document.createElement("div");
 
@@ -151,9 +152,6 @@ function ajoutItems(objtCreateItems){
         objtCreateItems.divItemContentSetting.append(objtCreateItems.divItemContentSettingQt, objtCreateItems.divItemContentSettingDel);
         objtCreateItems.divItemContentSettingQt.append(objtCreateItems.paraQt, objtCreateItems.inputQt);
         objtCreateItems.divItemContentSettingDel.append(objtCreateItems.paraDel);
-
-
-
 
 }
 
@@ -260,7 +258,6 @@ function qtChange (event) {
                 localStorage.ArrayStorage = JSON.stringify(arrayStorage);
 
             }
-
         } 
 
     paraQt.textContent = "Qté : " + newQT;
@@ -268,9 +265,189 @@ function qtChange (event) {
     calculQt();
 
     }
+}
 
+function recupOrder(){
+
+    let firstName = document.getElementById('firstName');
+    let lastName = document.getElementById('lastName');
+    let address = document.getElementById('address');
+    let city = document.getElementById('city');
+    let email = document.getElementById('email');
+
+    let objRecupOrder = {
+
+        firstName : firstName,
+        lastName : lastName,
+        address : address,
+        city : city,
+        email : email,
+
+    }
+
+    return objRecupOrder;
+
+}
+
+async function submitOrder(event){
+
+    let firstName = verifFirstName();
+    let lastName = verifLastName();
+    let address = verifAdress();
+    let city = verifCity();
+    let email = verifEmail();
+
+    if(firstName == "Erreur" || lastName == "Erreur" || address == "Erreur" || city == "Erreur" || email == "Erreur"){
+
+    alert("Veuillez corriger votre formulaire");
+
+    } else {
+
+        let contact = {
+
+        firstName : firstName,
+        lastName : lastName,
+        address : address,
+        city : city,
+        email : email
+
+        }
+
+        let arrayStorage = localStorage.getItem('ArrayStorage');
+        arrayStorage = JSON.parse(arrayStorage);
+        let products = new Array();
+
+        for (let object of arrayStorage){
+
+        let id = object.id;
+        products.push(id);
+
+        }
+
+        let envoyerCommande = {
+
+            contact: contact,
+            products: products
+
+        }
+
+        let response = await fetch('http://localhost:3000/api/products/order', {
+
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+
+            body: JSON.stringify(envoyerCommande)
+
+          });
+
+
+          let jsonResponse = await response.json();
+
+          let idResponse = jsonResponse.orderId
+
+          location.replace("./confirmation.html?id="+idResponse)
+
+          console.log(jsonResponse, idResponse, envoyerCommande)
+    }
+}
+
+function verifFirstName(){
+
+    let objrecupOrder = recupOrder();
+
+    let regex = /[a-zA-Z]+/g;
+
+    if(regex.test(objrecupOrder.firstName.value)){
+
+        return objrecupOrder.firstName.value
+
+    } else {
+
+        let paraFail = document.getElementById("firstNameErrorMsg");
+        paraFail.textContent = "Le First Name n'est pas valide";
+
+        return "Erreur";
+
+    }
+}
+
+function verifLastName(){
+
+    let objrecupOrder = recupOrder();
+    let regex = /[a-zA-Z]+/g;
+
+    if(regex.test(objrecupOrder.lastName.value)){
+
+        return objrecupOrder.lastName.value;
+
+    } else {
+
+        let paraFail = document.getElementById("lastNameErrorMsg");
+        paraFail.textContent = "Le Last Name n'est pas valide";
+
+        return "Erreur";
+
+    }
+}
+
+function verifAdress(){
+
+    let objrecupOrder = recupOrder();
+    let regex = /[A-Za-z0-9'\.\-\s\,]/;
+
+    if(regex.test(objrecupOrder.address.value)){
+
+        return objrecupOrder.address.value;
+
+    } else {
+
+        let paraFail = document.getElementById("addressErrorMsg");
+        paraFail.textContent = "L'adresse n'est pas valide";
+
+        return "Erreur";
+
+    }
+}
+
+function verifCity(){
+
+    let objrecupOrder = recupOrder();
+    let regex = /[a-zA-Z]+/g;
+
+    if(regex.test(objrecupOrder.city.value)){
+
+    return objrecupOrder.city.value
+
+    } else {
+
+        let paraFail = document.getElementById("cityErrorMsg");
+        paraFail.textContent = "La ville n'est pas valide";
+
+        return "Erreur";
+
+    }
+}
+
+function verifEmail(){
+
+    let objrecupOrder = recupOrder();
+    let regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+    if(regex.test(objrecupOrder.email.value)){
+
+        return objrecupOrder.email.value;
+
+    } else {
+
+        let paraFail = document.getElementById("emailErrorMsg");
+        paraFail.textContent = "Le Email n'est pas valide";
+
+        return "Erreur";
+    }
 }
 
 window.addEventListener("DOMContentLoaded", (event) => {
     init();
-  });
+});
