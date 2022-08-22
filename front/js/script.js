@@ -23,13 +23,14 @@ function init() {
 
 function turnOnProducts(products) {
     let items = document.getElementById("items");
-    for (product of products){
+    for (let product of products){
         let cardProduct = displayProduct(product);
         items.append(cardProduct);
     }
 }
 
 function displayProduct(product) {
+
     let lien = document.createElement("a");
     lien.setAttribute('href', `./product.html?id=${product._id}`);
 

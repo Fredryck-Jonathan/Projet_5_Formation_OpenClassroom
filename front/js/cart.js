@@ -1,7 +1,7 @@
 /**
  * 
  * 
- * 
+ * Le but de cette fonction est d'initialiser le scripte de la page suite a la fin du chargement de celle-ci
  */
 async function  init(){
 
@@ -9,6 +9,14 @@ async function  init(){
     arrayStorage = JSON.parse(arrayStorage);
 
     console.log(JSON.stringify(arrayStorage));
+
+    let submit =  document.forms[0]
+ 
+    submit.addEventListener("submit", (e) => {
+        e.preventDefault();
+        submitOrder();
+        return false;
+    });
 
     if(localStorage.length == 0 || JSON.stringify(arrayStorage) == "[]"){
 
@@ -29,11 +37,7 @@ async function  init(){
 
             calculQt();
 
-            let submit =  document.getElementById('order')
- 
-            submit.addEventListener("click", (event) => {
-                submitOrder(event);
-            });
+
 
         };
 
@@ -42,9 +46,9 @@ async function  init(){
 };
 
 /**
+ * Argument: infos, product
  * 
- * 
- * 
+ * Le but de cette fonction est de creer les items afin de les envoyer à ajoutItems.
  */
 function createItems(infos,  product){
 
@@ -136,9 +140,9 @@ function createItems(infos,  product){
 }
 
 /**
+ * Argument: objtCreateItems
  * 
- * 
- * 
+ * Le but de cette fonction est d'ajouter les objt de la fonction CreateItems dans le document html
  */
 function ajoutItems(objtCreateItems){
 
@@ -156,9 +160,9 @@ function ajoutItems(objtCreateItems){
 }
 
 /**
+ * Argument: event
  * 
- * 
- * 
+ * Le but de cette fonction est de supprimer l'objet selectionner lors du clique de l'evenement, et de lancer la fonction calculQt.
  */
 function delCommand(event) {
 
@@ -203,7 +207,7 @@ function delCommand(event) {
 /**
  * 
  * 
- * 
+ * Le but de cette fonction est de calculer la valeur quantité et de l'afficher.
  */
 function calculQt(){
 
@@ -224,9 +228,9 @@ function calculQt(){
 }
 
 /**
+ * Argument : Event
  * 
- * 
- * 
+ * le but de cette fonction est que si la valeur quantité change, il modifie cette valeur et recalcul le total
  */
 function qtChange (event) {
 
@@ -267,51 +271,86 @@ function qtChange (event) {
     }
 }
 
+/**
+ * 
+ *  Renvoie l'objet contact si error = false sinon renvoie false
+ *  Le but de cette fonction est de renvoyer si les valeurs sont bonnes suite au passage test de regex, l'objet avec les valeurs validé sinon renvoie false
+ */
 function recupOrder(){
 
+    let error = false;
+
     let firstName = document.getElementById('firstName');
-    let lastName = document.getElementById('lastName');
-    let address = document.getElementById('address');
-    let city = document.getElementById('city');
-    let email = document.getElementById('email');
+    if (verifName(firstName, firstName.value) === false){
 
-    let objRecupOrder = {
-
-        firstName : firstName,
-        lastName : lastName,
-        address : address,
-        city : city,
-        email : email,
+        error = true;
 
     }
 
-    return objRecupOrder;
+     let lastName = document.getElementById('lastName');
+
+     if (verifName(lastName, lastName.value) === false){
+
+        error = true;
+
+    }
+
+    let address = document.getElementById('address');
+    if (verifAdress(address, address.value) === false){
+
+        error = true;
+
+    }
+
+
+    let city = document.getElementById('city');
+    if (verifName(city, city.value) === false){
+
+        error = true;
+
+    }
+
+
+    let email = document.getElementById('email');
+
+    if (verifEmail(email, email.value) === false){
+
+        error = true;
+
+    }
+
+    if (error == false ){
+        let contact = {
+
+            firstName : firstName.value,
+            lastName : lastName.value,
+            address : address.value,
+            city : city.value,
+            email : email.value,
+
+        }
+
+        return contact
+    }
+
+    return false;
 
 }
 
-async function submitOrder(event){
+/**
+ * 
+ * 
+ * le but de cette fonction et suite a la recuperation de recupOrder recuperer un objet et amener le client devant son numéro de commande
+ */
+async function submitOrder(){
 
-    let firstName = verifFirstName();
-    let lastName = verifLastName();
-    let address = verifAdress();
-    let city = verifCity();
-    let email = verifEmail();
+        if (recupOrder() === false){
 
-    if(firstName == "Erreur" || lastName == "Erreur" || address == "Erreur" || city == "Erreur" || email == "Erreur"){
-
-    alert("Veuillez corriger votre formulaire");
-
-    } else {
-
-        let contact = {
-
-        firstName : firstName,
-        lastName : lastName,
-        address : address,
-        city : city,
-        email : email
+            return false
 
         }
+
+        let contact = recupOrder();
 
         let arrayStorage = localStorage.getItem('ArrayStorage');
         arrayStorage = JSON.parse(arrayStorage);
@@ -351,103 +390,86 @@ async function submitOrder(event){
 
           console.log(jsonResponse, idResponse, envoyerCommande)
     }
-}
 
-function verifFirstName(){
+/**
+ * Argument : name et value 
+ * Renvoie la valeur "value" si jamais la valeur passe le regex sinon renvoie false
+ * Test value avec le regex enregistrer
+ */
+function verifName(name, value){
 
-    let objrecupOrder = recupOrder();
+    
+    let regex = /[^%$€"'~*+.;:!?,<>"#°=+£¤&²{}[\]`@()_|\/[\\ ^¨§µ\d]/g;
 
-    let regex = /[a-zA-Z]+/g;
+    if(regex.test(value)){
 
-    if(regex.test(objrecupOrder.firstName.value)){
-
-        return objrecupOrder.firstName.value
+        return value
 
     } else {
+        
 
-        let paraFail = document.getElementById("firstNameErrorMsg");
-        paraFail.textContent = "Le First Name n'est pas valide";
+        let paraFail = document.getElementById(name.name + "ErrorMsg");
 
-        return "Erreur";
+        console.log(paraFail, name)
+        paraFail.textContent = "Le Champ n'est pas valide";
+
+        return false;
 
     }
 }
 
-function verifLastName(){
 
-    let objrecupOrder = recupOrder();
-    let regex = /[a-zA-Z]+/g;
+/**
+ * Argument : name et value 
+ * Renvoie la valeur "value" si jamais la valeur passe le regex sinon renvoie false
+ * Test value avec le regex enregistrer
+ */
+function verifAdress(name, value){
 
-    if(regex.test(objrecupOrder.lastName.value)){
+    let regex = /[^%$€"'~*+.;:!?,<>"#°=+£¤&²{}[\]`@()_|\/[\\ ^¨§µ]/g;
 
-        return objrecupOrder.lastName.value;
+    if(regex.test(value)){
+
+        return value;
 
     } else {
 
-        let paraFail = document.getElementById("lastNameErrorMsg");
-        paraFail.textContent = "Le Last Name n'est pas valide";
+        let paraFail = document.getElementById(name.name + "ErrorMsg");
+        paraFail.textContent = "Le champ n'est pas valide";
 
-        return "Erreur";
+        return false;
 
     }
 }
 
-function verifAdress(){
+/**
+ * Argument : name et value 
+ * Renvoie la valeur "value" si jamais la valeur passe le regex sinon renvoie false
+ * Test value avec le regex enregistrer
+ */
+function verifEmail(name, value){
 
-    let objrecupOrder = recupOrder();
-    let regex = /[A-Za-z0-9'\.\-\s\,]/;
 
-    if(regex.test(objrecupOrder.address.value)){
-
-        return objrecupOrder.address.value;
-
-    } else {
-
-        let paraFail = document.getElementById("addressErrorMsg");
-        paraFail.textContent = "L'adresse n'est pas valide";
-
-        return "Erreur";
-
-    }
-}
-
-function verifCity(){
-
-    let objrecupOrder = recupOrder();
-    let regex = /[a-zA-Z]+/g;
-
-    if(regex.test(objrecupOrder.city.value)){
-
-    return objrecupOrder.city.value
-
-    } else {
-
-        let paraFail = document.getElementById("cityErrorMsg");
-        paraFail.textContent = "La ville n'est pas valide";
-
-        return "Erreur";
-
-    }
-}
-
-function verifEmail(){
-
-    let objrecupOrder = recupOrder();
     let regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
-    if(regex.test(objrecupOrder.email.value)){
+    if(regex.test(value)){
 
-        return objrecupOrder.email.value;
+        return value;
 
     } else {
 
-        let paraFail = document.getElementById("emailErrorMsg");
-        paraFail.textContent = "Le Email n'est pas valide";
+        let paraFail = document.getElementById(name.name + "ErrorMsg");
+        paraFail.textContent = "Le champ n'est pas valide";
 
-        return "Erreur";
+        return false;
     }
 }
 
+/**
+ * 
+ * 
+ * une fois la page charger entierement, on execute la fonction init
+ */
 window.addEventListener("DOMContentLoaded", (event) => {
     init();
 });
