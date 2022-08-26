@@ -46,11 +46,13 @@ async function  init(){
 };
 
 /**
- * Argument: infos, product
+ * Argument: infos (object), product (object)
  * 
  * Le but de cette fonction est de creer les items afin de les envoyer à ajoutItems.
  */
 function createItems(infos,  product){
+
+    console.log(typeof product, typeof infos)
 
     let article = document.createElement("article");
     article.setAttribute('class',"cart__item");
@@ -140,7 +142,7 @@ function createItems(infos,  product){
 }
 
 /**
- * Argument: objtCreateItems
+ * Argument: objtCreateItems (object)
  * 
  * Le but de cette fonction est d'ajouter les objt de la fonction CreateItems dans le document html
  */
@@ -160,7 +162,7 @@ function ajoutItems(objtCreateItems){
 }
 
 /**
- * Argument: event
+ * Argument: event (object)
  * 
  * Le but de cette fonction est de supprimer l'objet selectionner lors du clique de l'evenement, et de lancer la fonction calculQt.
  */
@@ -228,11 +230,13 @@ function calculQt(){
 }
 
 /**
- * Argument : Event
+ * Argument : event (object)
  * 
  * le but de cette fonction est que si la valeur quantité change, il modifie cette valeur et recalcul le total
  */
 function qtChange (event) {
+
+    console.log(typeof event,)
 
     let inputQt = event.target;
     let divParaQt = inputQt.closest("div");
@@ -384,31 +388,34 @@ async function submitOrder(){
 
           let jsonResponse = await response.json();
 
-          let idResponse = jsonResponse.orderId
+          let idResponse = jsonResponse.orderId;
 
-          location.replace("./confirmation.html?id="+idResponse)
+          localStorage.removeItem("ArrayStorage");
 
-          console.log(jsonResponse, idResponse, envoyerCommande)
+          location.replace("./confirmation.html?id="+idResponse);
+
+          console.log(jsonResponse, idResponse, envoyerCommande);
     }
 
 /**
- * Argument : name et value 
- * Renvoie la valeur "value" si jamais la valeur passe le regex sinon renvoie false
+ * Argument: name (object), value (string)
+ * Renvoie la valeur "value" (string) si jamais la valeur passe le regex sinon renvoie false
  * Test value avec le regex enregistrer
  */
 function verifName(name, value){
 
-    
-    let regex = /[^%$€"'~*+.;:!?,<>"#°=+£¤&²{}[\]`@()_|\/[\\ ^¨§µ\d]/g;
+    console.log(typeof name, typeof value)
+
+
+    let regex = /^[^%$€"'~*+.;:!?,<>"#°=+£¤&²{}[\]`@()_|\/[\\^¨§µ\d]*$/g;
+    let paraFail = document.getElementById(name.name + "ErrorMsg");
 
     if(regex.test(value)){
 
+        paraFail.textContent = "";
         return value
 
     } else {
-        
-
-        let paraFail = document.getElementById(name.name + "ErrorMsg");
 
         console.log(paraFail, name)
         paraFail.textContent = "Le Champ n'est pas valide";
@@ -420,21 +427,23 @@ function verifName(name, value){
 
 
 /**
- * Argument : name et value 
- * Renvoie la valeur "value" si jamais la valeur passe le regex sinon renvoie false
+ * Argument : name (object), value (string)
+ * Renvoie la valeur "value"(string) si jamais la valeur passe le regex sinon renvoie false
  * Test value avec le regex enregistrer
  */
 function verifAdress(name, value){
 
-    let regex = /[^%$€"'~*+.;:!?,<>"#°=+£¤&²{}[\]`@()_|\/[\\ ^¨§µ]/g;
+    let regex = /^[^%$€"'~*+.;:!?,<>"#°=+£¤&²{}[\]`@()_|\/[\\^¨§µ]*$/g;
+    let paraFail = document.getElementById(name.name + "ErrorMsg");
 
     if(regex.test(value)){
 
+        paraFail.textContent = "";
         return value;
 
     } else {
 
-        let paraFail = document.getElementById(name.name + "ErrorMsg");
+
         paraFail.textContent = "Le champ n'est pas valide";
 
         return false;
@@ -443,22 +452,24 @@ function verifAdress(name, value){
 }
 
 /**
- * Argument : name et value 
- * Renvoie la valeur "value" si jamais la valeur passe le regex sinon renvoie false
+ * Argument : name (object), value (string)
+ * Renvoie la valeur "value"(string) si jamais la valeur passe le regex sinon renvoie false
  * Test value avec le regex enregistrer
  */
 function verifEmail(name, value){
 
 
     let regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    let paraFail = document.getElementById(name.name + "ErrorMsg");
 
     if(regex.test(value)){
 
+        paraFail.textContent = "";
         return value;
 
     } else {
 
-        let paraFail = document.getElementById(name.name + "ErrorMsg");
+
         paraFail.textContent = "Le champ n'est pas valide";
 
         return false;
