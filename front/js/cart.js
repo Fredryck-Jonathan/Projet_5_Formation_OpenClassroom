@@ -151,13 +151,13 @@ function ajoutItems(objtCreateItems){
     let sectionCartItems = document.getElementById("cart__items");
 
     sectionCartItems.append(objtCreateItems.article);
-        objtCreateItems.article.append(objtCreateItems.divItemImg, objtCreateItems.divItemContent, objtCreateItems.divItemContentSetting);
-        objtCreateItems.divItemImg.append(objtCreateItems.img);
-        objtCreateItems.divItemContent.append(objtCreateItems.divItemContentDescription);
-        objtCreateItems.divItemContentDescription.append(objtCreateItems.h2, objtCreateItems.paraColor, objtCreateItems.paraPrice);
-        objtCreateItems.divItemContentSetting.append(objtCreateItems.divItemContentSettingQt, objtCreateItems.divItemContentSettingDel);
-        objtCreateItems.divItemContentSettingQt.append(objtCreateItems.paraQt, objtCreateItems.inputQt);
-        objtCreateItems.divItemContentSettingDel.append(objtCreateItems.paraDel);
+    objtCreateItems.article.append(objtCreateItems.divItemImg, objtCreateItems.divItemContent, objtCreateItems.divItemContentSetting);
+    objtCreateItems.divItemImg.append(objtCreateItems.img);
+    objtCreateItems.divItemContent.append(objtCreateItems.divItemContentDescription);
+    objtCreateItems.divItemContentDescription.append(objtCreateItems.h2, objtCreateItems.paraColor, objtCreateItems.paraPrice);
+    objtCreateItems.divItemContentSetting.append(objtCreateItems.divItemContentSettingQt, objtCreateItems.divItemContentSettingDel);
+    objtCreateItems.divItemContentSettingQt.append(objtCreateItems.paraQt, objtCreateItems.inputQt);
+    objtCreateItems.divItemContentSettingDel.append(objtCreateItems.paraDel);
 
 }
 
@@ -259,10 +259,6 @@ function qtChange (event) {
 
                 element.quantite = newQT;
 
-                let numberElement = arrayStorage.indexOf(element);
-
-                arrayStorage[numberElement] = element;
-
                 localStorage.ArrayStorage = JSON.stringify(arrayStorage);
 
             }
@@ -285,7 +281,7 @@ function recupOrder(){
     let error = false;
 
     let firstName = document.getElementById('firstName');
-    if (verifName(firstName, firstName.value) === false){
+    if (verifName(firstName) === false){
 
         error = true;
 
@@ -293,14 +289,14 @@ function recupOrder(){
 
      let lastName = document.getElementById('lastName');
 
-     if (verifName(lastName, lastName.value) === false){
+     if (verifName(lastName) === false){
 
         error = true;
 
     }
 
     let address = document.getElementById('address');
-    if (verifAdress(address, address.value) === false){
+    if (verifAdress(address) === false){
 
         error = true;
 
@@ -308,7 +304,7 @@ function recupOrder(){
 
 
     let city = document.getElementById('city');
-    if (verifName(city, city.value) === false){
+    if (verifName(city) === false){
 
         error = true;
 
@@ -317,7 +313,7 @@ function recupOrder(){
 
     let email = document.getElementById('email');
 
-    if (verifEmail(email, email.value) === false){
+    if (verifEmail(email) === false){
 
         error = true;
 
@@ -348,13 +344,13 @@ function recupOrder(){
  */
 async function submitOrder(){
 
-        if (recupOrder() === false){
+        let contact = recupOrder();
+
+        if (contact === false){
 
             return false
 
         }
-
-        let contact = recupOrder();
 
         let arrayStorage = localStorage.getItem('ArrayStorage');
         arrayStorage = JSON.parse(arrayStorage);
@@ -398,26 +394,22 @@ async function submitOrder(){
     }
 
 /**
- * Argument: name (object), value (string)
+ * Argument: element (object)
  * Renvoie la valeur "value" (string) si jamais la valeur passe le regex sinon renvoie false
  * Test value avec le regex enregistrer
  */
-function verifName(name, value){
-
-    console.log(typeof name, typeof value)
-
+function verifName(element){
 
     let regex = /^[^%$€"'~*+.;:!?,<>"#°=+£¤&²{}[\]`@()_|\/[\\^¨§µ\d]*$/g;
-    let paraFail = document.getElementById(name.name + "ErrorMsg");
+    let paraFail = document.getElementById(element.name + "ErrorMsg");
 
-    if(regex.test(value)){
+    if(regex.test(element.value)){
 
         paraFail.textContent = "";
-        return value
+        return element.value
 
     } else {
 
-        console.log(paraFail, name)
         paraFail.textContent = "Le Champ n'est pas valide";
 
         return false;
@@ -427,19 +419,19 @@ function verifName(name, value){
 
 
 /**
- * Argument : name (object), value (string)
+ * Argument : element (object)
  * Renvoie la valeur "value"(string) si jamais la valeur passe le regex sinon renvoie false
  * Test value avec le regex enregistrer
  */
-function verifAdress(name, value){
+function verifAdress(element){
 
     let regex = /^[^%$€"'~*+.;:!?,<>"#°=+£¤&²{}[\]`@()_|\/[\\^¨§µ]*$/g;
-    let paraFail = document.getElementById(name.name + "ErrorMsg");
+    let paraFail = document.getElementById(element.name + "ErrorMsg");
 
-    if(regex.test(value)){
+    if(regex.test(element.value)){
 
         paraFail.textContent = "";
-        return value;
+        return element.value;
 
     } else {
 
@@ -452,20 +444,20 @@ function verifAdress(name, value){
 }
 
 /**
- * Argument : name (object), value (string)
+ * Argument : element (object)
  * Renvoie la valeur "value"(string) si jamais la valeur passe le regex sinon renvoie false
  * Test value avec le regex enregistrer
  */
-function verifEmail(name, value){
+function verifEmail(element){
 
 
     let regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    let paraFail = document.getElementById(name.name + "ErrorMsg");
+    let paraFail = document.getElementById(element.name + "ErrorMsg");
 
-    if(regex.test(value)){
+    if(regex.test(element.value)){
 
         paraFail.textContent = "";
-        return value;
+        return element.value;
 
     } else {
 

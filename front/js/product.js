@@ -9,6 +9,12 @@ function init(){
 
     let promise01 = fetch("http://localhost:3000/api/products/"+ id);
 
+    let addToCart = document.getElementById("addToCart");
+
+    addToCart.addEventListener("click", (event) => {
+        createcommand();
+    });
+
     promise01
     .then((response) => {
 
@@ -17,12 +23,6 @@ function init(){
         productData.then((infos) => { 
 
             createItems(infos);
-
-            let addToCart = document.getElementById("addToCart");
-
-            addToCart.addEventListener("click", (event) => {
-                createcommand();
-            });
 
         })
 
@@ -59,7 +59,7 @@ function createItems(infos){
     console.log(infos);
     let colors = infos.colors;
 
-    for (color in colors){ 
+    for (let color in colors){ 
 
         addColor(colors);
 
@@ -98,7 +98,7 @@ function addColor(colors){
  * 
  *  valeur qui initie la création de la commande
 */
-function createcommand () {
+function createcommand() {
 
     let recupValeur = recupValue();
 
@@ -107,54 +107,57 @@ function createcommand () {
     if (recupValeur.couleur == "" ){
 
         alert("Veuillez choisir une couleur");
+        return false
 
     }
 
-    else {
+    if (recupValeur.quantite < 1){
 
-        if (recupValeur.quantite < 1){
+    alert("Veuillez choisir une quantité au-dessus de 0");
+    return false
 
-            alert("Veuillez choisir une quantité au-dessus de 0");
+    }
+ 
+    let ArrayStorage = localStorage.getItem("ArrayStorage");
 
-        }
+    console.log(ArrayStorage, recupValeur)
 
-        else { 
+        if (localStorage.length != 0 && ArrayStorage != "[]" ){
 
-            let ArrayStorage = localStorage.getItem("ArrayStorage");
+            ArrayStorage = JSON.parse(ArrayStorage);
 
-            console.log(ArrayStorage, recupValeur)
+            let addNewItem = false
 
-            if (localStorage.length != 0 && ArrayStorage != "[]" ){
+            for(let i in ArrayStorage){
 
-                ArrayStorage = JSON.parse(ArrayStorage);
+                let objectSto = ArrayStorage[i]
 
-                for(let object in ArrayStorage){
+            if( objectSto.id === recupValeur.id && objectSto.couleur === recupValeur.couleur){
 
-                    console.log(object)
-
-                    let objectSto = ArrayStorage[object]
-
-                    console.log(objectSto.quantite, objectSto)
-
-                    if( objectSto.id === recupValeur.id && objectSto.couleur === recupValeur.couleur){
-
-                        changementquantite(recupValeur, objectSto, object);
-
-                    } else if( object == (Number(ArrayStorage.length)-1)) {
-
-                        addItem(recupValeur, ArrayStorage)
-
-                    }
-                }
-            } 
-            else { 
-
-                addFirstItem(recupValeur);
+                changementquantite(recupValeur, objectSto, i);
+                let quantiteStorage = parseInt(ArrayStorage[i].quantite);
+                ArrayStorage[i].quantite = quantiteStorage + parseInt(recupValeur.quantite);
+                addNewItem = true
 
             }
         }
+
+        if (!addNewItem) {
+
+            addItem(recupValeur, ArrayStorage);
+
+        } else {
+            localStorage.setItem('ArrayStorage',JSON.stringify(ArrayStorage));
+            alert("Votre commande a bien été modifiée")
+        }
+    } else { 
+
+        addItem(recupValeur);
+
     }
 }
+    
+
 
 
 /** 
@@ -278,7 +281,9 @@ function changementquantite(recupValeur, objectSto, object){
 */
 function addItem(object, ArrayStorage) {
 
-
+    if ('undefined' === typeof(ArrayStorage)){
+        ArrayStorage = [];
+    }
 
     ArrayStorage.push(object);
 
@@ -287,24 +292,6 @@ function addItem(object, ArrayStorage) {
     alert("Votre commande a été ajouter au panier");
 
 }
-
-/**
- * 
- * Renvoie une alert
- * ajoute le premier Item si jamais le localStorage est vide
- */
-function addFirstItem(infos) {
-
-    let ArrayStorage = [];
-
-    ArrayStorage.push(infos);
-
-    localStorage.setItem('ArrayStorage', JSON.stringify(ArrayStorage));
-
-    alert("Votre commande a été ajouter au panier");
-
-}
-
 
 window.addEventListener("DOMContentLoaded", (event) => {
     init();
